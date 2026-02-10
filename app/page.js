@@ -1,66 +1,91 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+import {
+  Box,
+  Input,
+  Button,
+  Text,
+  VStack,
+  HStack,
+  Heading,
+  useToast,
+} from "@chakra-ui/react";
+import { useState } from "react";
+import { voters } from "./list.js";
+import VoterCard from "./components/VoterCard.jsx";
 
 export default function Home() {
+  const [epic, setEpic] = useState("");
+  const [result, setResult] = useState(null);
+  const toast = useToast();
+
+  const handleSearch = () => {
+    const found = voters.find(
+      (v) => v.epicNo.toLowerCase() === epic.trim().toLowerCase(),
+    );
+
+    if (!found) {
+      setResult(null);
+      toast({
+        title: "No record found",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    } else {
+      setResult(found);
+    }
+  };
+
+  const handlePrint = () => {
+    const printContent = document.getElementById("print-card").innerHTML;
+    const win = window.open("", "", "width=350,height=600");
+    win.document.write(`
+      <html>
+        <head>
+          <title>Print</title>
+          <style>
+            body { font-family: Arial; padding: 10px; }
+          </style>
+        </head>
+        <body>
+          ${printContent}
+        </body>
+      </html>
+    `);
+    win.document.close();
+    win.focus();
+    win.print();
+    win.close();
+  };
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.js file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <Box minH="100vh" bg="gray.900" color="white" p={6}>
+      <VStack spacing={6} maxW="600px" mx="auto">
+        <Heading>Voter Search</Heading>
+
+        <HStack w="100%">
+          <Input
+            placeholder="Enter EPIC Number"
+            value={epic}
+            onChange={(e) => setEpic(e.target.value)}
+          />
+          <Button colorScheme="orange" onClick={handleSearch}>
+            Search
+          </Button>
+        </HStack>
+
+        {result && (
+          <>
+            <VoterCard voter={result} />
+
+            <HStack>
+              <Button colorScheme="blue" onClick={handlePrint}>
+                Print Card
+              </Button>
+            </HStack>
+          </>
+        )}
+      </VStack>
+    </Box>
   );
 }
