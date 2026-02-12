@@ -332,9 +332,12 @@ export default function VoterCard({ voter }) {
 
       {/* Footer */}
       <Text textAlign={"start"} fontWeight={600} fontSize={"14px"}>
-        Serial No. {voter?.Location || "0"}
+        Serial No. {voter?.["Serial No"] || "0"}
       </Text>
       {/* Footer */}
+      <Text textAlign={"start"} fontWeight={600} fontSize={"14px"}>
+        Polling Booth - 16/1
+      </Text>
       <Text textAlign={"start"} fontWeight={600} fontSize={"14px"}>
         Polling Station -
       </Text>
