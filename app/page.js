@@ -9,7 +9,7 @@ import {
   Heading,
   useToast,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { voters } from "./list.js";
 import VoterCard from "./components/VoterCard.jsx";
 
@@ -18,10 +18,22 @@ export default function Home() {
   const [result, setResult] = useState(null);
   const toast = useToast();
 
+  // 🔥 Pre-index voters by EPIC No for O(1) lookup
+  const voterMap = useMemo(() => {
+    const map = new Map();
+    voters.forEach((v) => {
+      const epicKey = v?.["Epic No"]?.toString().trim().toLowerCase();
+      if (epicKey) map.set(epicKey, v);
+    });
+    return map;
+  }, []);
+
+  const normalizeEpic = (val = "") =>
+    val.toString().trim().toLowerCase();
+
   const handleSearch = () => {
-    const found = voters.find(
-      (v) => v.epicNo.toLowerCase() === epic.trim().toLowerCase(),
-    );
+    const key = normalizeEpic(epic);
+    const found = voterMap.get(key);
 
     if (!found) {
       setResult(null);
@@ -37,7 +49,9 @@ export default function Home() {
   };
 
   const handlePrint = () => {
-    const printContent = document.getElementById("print-card").innerHTML;
+    const printContent = document.getElementById("print-card")?.innerHTML;
+    if (!printContent) return;
+
     const win = window.open("", "", "width=350,height=600");
     win.document.write(`
       <html>
@@ -68,6 +82,7 @@ export default function Home() {
             placeholder="Enter EPIC Number"
             value={epic}
             onChange={(e) => setEpic(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()} // ⏎ enter to search
           />
           <Button colorScheme="orange" onClick={handleSearch}>
             Search
