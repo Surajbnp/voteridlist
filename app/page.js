@@ -8,6 +8,7 @@ import {
   HStack,
   Heading,
   useToast,
+  Spinner,
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { voters } from "./list.js";
@@ -17,6 +18,7 @@ export default function Home() {
   const [epic, setEpic] = useState("");
   const [result, setResult] = useState(null);
   const toast = useToast();
+  const [loading, setLoading] = useState(false);
 
   // 🔥 Pre-index voters by EPIC No for O(1) lookup
   const voterMap = useMemo(() => {
@@ -28,10 +30,10 @@ export default function Home() {
     return map;
   }, []);
 
-  const normalizeEpic = (val = "") =>
-    val.toString().trim().toLowerCase();
+  const normalizeEpic = (val = "") => val.toString().trim().toLowerCase();
 
   const handleSearch = () => {
+    setLoading(true);
     const key = normalizeEpic(epic);
     const found = voterMap.get(key);
 
@@ -46,6 +48,10 @@ export default function Home() {
     } else {
       setResult(found);
     }
+
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
   };
 
   const handlePrint = () => {
@@ -73,32 +79,50 @@ export default function Home() {
   };
 
   return (
-    <Box minH="100vh" bg="gray.900" color="white" p={6}>
-      <VStack spacing={6} maxW="600px" mx="auto">
-        <Heading>Voter Search</Heading>
+    <Box
+      minH="100vh"
+      bg={'blackAlpha.800'}
+      p={6}
+      display={"flex"}
+      alignItems={"center"}
+      justifyContent={"center"}
+    >
+      <VStack spacing={6} maxW="600px" w={"100%"} mx="auto">
+        <Box display="flex" alignItems={"center"} justifyContent={"center"}>
+          <img
+            width={"450px"}
+            src="https://res.cloudinary.com/dddnxiqpq/image/upload/v1770897814/WAR_2_fltadx.webp"
+          />
+        </Box>
 
-        <HStack w="100%">
+        <HStack w={{ base: "100%", md: "400px" }}>
           <Input
+            w={"100%"}
             placeholder="Enter EPIC Number"
+            required
             value={epic}
             onChange={(e) => setEpic(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()} // ⏎ enter to search
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           />
           <Button colorScheme="orange" onClick={handleSearch}>
             Search
           </Button>
         </HStack>
 
-        {result && (
-          <>
-            <VoterCard voter={result} />
+        {loading ? (
+          <Spinner />
+        ) : (
+          result && (
+            <>
+              <VoterCard voter={result} />
 
-            <HStack>
-              <Button colorScheme="blue" onClick={handlePrint}>
-                Print Card
-              </Button>
-            </HStack>
-          </>
+              <HStack>
+                <Button colorScheme="blue" onClick={window.print}>
+                  Print Card
+                </Button>
+              </HStack>
+            </>
+          )
         )}
       </VStack>
     </Box>

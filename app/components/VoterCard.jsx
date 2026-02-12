@@ -108,6 +108,14 @@ export default function VoterCard({ voter }) {
     voter?.["Father's "]?.[" Husband's Name (Hindi)"],
   );
 
+  const acSR = voter?.["AC "]?.[" Part "]?.[" SR"] || "";
+
+  const [assemblyNo, partNo, serialNo] = acSR.split("/").map((s) => s.trim());
+
+  console.log(assemblyNo);
+  console.log(partNo);
+  console.log(serialNo); 
+
   return (
     <Box
       id="print-card"
@@ -238,7 +246,7 @@ export default function VoterCard({ voter }) {
 
         <Divider my={2} borderColor="gray.500" />
 
-        <Text textTransform={'uppercase'} fontSize="sm" fontWeight="bold">
+        <Text textTransform={"uppercase"} fontSize="sm" fontWeight="bold">
           Fir Ek Baar, Dil Se Aabhar
         </Text>
       </Box>
@@ -280,16 +288,16 @@ export default function VoterCard({ voter }) {
         p={2}
       >
         <Row label="Name">
-          <Text fontWeight="semibold">{voter?.["Name(English)"] || "—"}</Text>
+          <Text fontWeight="semibold">{voter?.["Name(Hindi)"] || "—"}</Text>
           <Text fontSize="xs" color="gray.600">
-            {voter?.["Name(Hindi)"] || ""}
+            {voter?.["Name(English)"] || ""}
           </Text>
         </Row>
 
         <Row label="Parent / Spouse">
-          <Text>{fatherEnglish || "—"}</Text>
+          <Text>{fatherHindi || "—"}</Text>
           <Text fontSize="xs" color="gray.600">
-            {fatherHindi || ""}
+            {fatherEnglish || ""}
           </Text>
         </Row>
 
@@ -308,15 +316,15 @@ export default function VoterCard({ voter }) {
       >
         <Row label="Assembly Constituency">
           <Text fontSize="xs" color="gray.600">
-            {"63 - Ranchi"}
+            {`${assemblyNo} - RANCHI` || "—"}
           </Text>
         </Row>
 
         <Row label="AC Part No.">
-          <Text fontSize="xs">{"227"}</Text>
+          <Text fontSize="xs">{partNo || "—"}</Text>
         </Row>
         <Row label="AC Serial No.">
-          <Text fontSize="xs">{"172"}</Text>
+          <Text fontSize="xs">{serialNo || "—"}</Text>
         </Row>
       </VStack>
 
@@ -324,7 +332,7 @@ export default function VoterCard({ voter }) {
 
       {/* Footer */}
       <Text textAlign={"start"} fontWeight={600} fontSize={"14px"}>
-        Serial No. {voter?.["SR No"] || "61/1"}
+        Serial No. {voter?.Location || "0"}
       </Text>
       {/* Footer */}
       <Text textAlign={"start"} fontWeight={600} fontSize={"14px"}>
