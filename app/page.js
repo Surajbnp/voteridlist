@@ -10,8 +10,7 @@ import {
   useToast,
   Spinner,
 } from "@chakra-ui/react";
-import { useMemo, useState } from "react";
-import { voters } from "./list.js";
+import { useState } from "react";
 import VoterCard from "./components/VoterCard.jsx";
 
 export default function Home() {
@@ -20,38 +19,56 @@ export default function Home() {
   const toast = useToast();
   const [loading, setLoading] = useState(false);
 
-  // 🔥 Pre-index voters by EPIC No for O(1) lookup
-  const voterMap = useMemo(() => {
-    const map = new Map();
-    voters.forEach((v) => {
-      const epicKey = v?.["Epic No"]?.toString().trim().toLowerCase();
-      if (epicKey) map.set(epicKey, v);
-    });
-    return map;
-  }, []);
+  const normalizeEpic = (val = "") => val.toString().trim().toUpperCase();
 
-  const normalizeEpic = (val = "") => val.toString().trim().toLowerCase();
+  const isValidEpic = normalizeEpic(epic).length === 10;
 
-  const handleSearch = () => {
-    setLoading(true);
+  const handleSearch = async () => {
     const key = normalizeEpic(epic);
-    const found = voterMap.get(key);
 
-    if (!found) {
+    if (!isValidEpic) {
+      toast({
+        title: "EPIC must be exactly 10 characters",
+        status: "warning",
+        duration: 2000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
       setResult(null);
+
+      const res = await fetch(`/api/voters?epic=${encodeURIComponent(key)}`);
+
+      if (!res.ok) {
+        throw new Error("Not found");
+      }
+
+      const data = await res.json();
+
+      if (!data) {
+        toast({
+          title: "No record found",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+      } else {
+        setResult(data);
+      }
+    } catch (err) {
       toast({
         title: "No record found",
         status: "error",
         duration: 2000,
         isClosable: true,
       });
-    } else {
-      setResult(found);
-    }
-
-    setTimeout(() => {
+      setResult(null);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
   const handlePrint = () => {
@@ -81,7 +98,7 @@ export default function Home() {
   return (
     <Box
       minH="100vh"
-      bg={'blackAlpha.800'}
+      bg={"blackAlpha.800"}
       p={6}
       display={"flex"}
       alignItems={"center"}
@@ -99,15 +116,29 @@ export default function Home() {
           <Input
             w={"100%"}
             placeholder="Enter EPIC Number"
+            color={'white'}
             required
             value={epic}
-            onChange={(e) => setEpic(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            onChange={(e) => setEpic(e.target.value.toUpperCase())}
+            onKeyDown={(e) =>
+              isValidEpic && e.key === "Enter" && handleSearch()
+            }
           />
-          <Button colorScheme="orange" onClick={handleSearch}>
+          <Button
+            colorScheme="orange"
+            onClick={handleSearch}
+            isLoading={loading}
+            isDisabled={!isValidEpic || loading}
+          >
             Search
           </Button>
         </HStack>
+
+        {!isValidEpic && epic.length > 0 && (
+          <Text fontSize="sm" color="whiteAlpha.700">
+            EPIC must be exactly 10 characters
+          </Text>
+        )}
 
         {loading ? (
           <Spinner />
@@ -117,7 +148,7 @@ export default function Home() {
               <VoterCard voter={result} />
 
               <HStack>
-                <Button colorScheme="blue" onClick={window.print}>
+                <Button colorScheme="blue" onClick={handlePrint}>
                   Print Card
                 </Button>
               </HStack>
