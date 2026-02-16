@@ -112,9 +112,6 @@ export default function VoterCard({ voter }) {
 
   const [assemblyNo, partNo, serialNo] = acSR.split("/").map((s) => s.trim());
 
-  console.log(assemblyNo);
-  console.log(partNo);
-  console.log(serialNo); 
 
   return (
     <Box
@@ -125,7 +122,7 @@ export default function VoterCard({ voter }) {
       borderRadius="lg"
       bg="white"
       color="black"
-      w={{ base: "100%", sm: "320px" }}
+      w={{ base: "100%", sm: "100%" }}
       maxW="360px"
       mx="auto"
       boxShadow="sm"
