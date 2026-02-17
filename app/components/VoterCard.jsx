@@ -119,8 +119,7 @@ export default function VoterCard({ voter }) {
   return (
     <Box
       id="print-card"
-      p={4}
-      border="1px solid"
+      // border="1px solid"
       borderColor="gray.300"
       borderRadius="lg"
       bg="white"
@@ -128,7 +127,7 @@ export default function VoterCard({ voter }) {
       w={{ base: "100%", sm: "320px" }}
       maxW="360px"
       mx="auto"
-      boxShadow="sm"
+      // boxShadow="sm"
     >
       {/* Ward Mitra Header (Poster style like ref image) */}
       <Box

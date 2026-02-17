@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import VoterCard from "./components/VoterCard.jsx";
+import VoterSlip from "./components/VoterSlip.jsx";
 
 export default function Home() {
   const [epic, setEpic] = useState("");
@@ -54,7 +55,7 @@ export default function Home() {
       } else {
         setResult(data);
         // Optional: auto-open print dialog in in-app browsers
-        setTimeout(() => window.print(), 600);
+        // setTimeout(() => window.print(), 600);
       }
     } catch (err) {
       toast({
@@ -79,7 +80,7 @@ export default function Home() {
       {/* PRINT VIEW (only card) */}
       {result ? (
         <Center minH="100vh" flexDir="column" gap={4}>
-          <VoterCard voter={result} />
+          <VoterSlip voter={result} />
           <HStack>
             <Button colorScheme="blue" onClick={() => window.print()}>
               Print
