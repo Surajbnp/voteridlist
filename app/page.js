@@ -12,7 +12,6 @@ import {
   Center,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import VoterCard from "./components/VoterCard.jsx";
 import VoterSlip from "./components/VoterSlip.jsx";
 
 export default function Home() {
